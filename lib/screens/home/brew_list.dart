@@ -12,7 +12,7 @@ class BrewList extends StatefulWidget {
 class _BrewListState extends State<BrewList> {
   @override
   Widget build(BuildContext context) {
-    final brews = Provider.of<List<Brew>>(context);
+    final brews = Provider.of<List<Brew>>(context) ??[];
     // here we r creating a variable for going through the list of data that is
     // available to us
     // mainly list of users and their data

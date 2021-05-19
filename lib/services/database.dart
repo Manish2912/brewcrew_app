@@ -1,4 +1,5 @@
 import 'package:brewcrew/models/brew.dart';
+import 'package:brewcrew/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
@@ -38,13 +39,34 @@ class DatabaseService {
           // then return the value of parameters by doc.data['parameter]
 // ?? if value is not present then pass blank string
           strength: doc.data['strength'] ?? 0,
-          sugars: doc.data['sugars'] ?? '');
+          sugars: doc.data['sugars'] ?? '0');
     }).toList(); // converting values in the list
   }
 
-  // we have replaced <QuerySnapshot> into list<brew> becoz iterable is of type of list 
-  Stream <List<Brew>> get brews {
+  //here we r returning user data object bu mapping snapshots obtained from documents
+  UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {
+    return UserData(
+      uid: uid, // this is available above
+      name: snapshot.data['name'], // from snapshot we r taking data
+      sugars: snapshot.data['sugars'],
+      strength: snapshot.data['strength'],
+    );
+  }
+
+  // we have replaced <QuerySnapshot> into list<brew> becoz iterable is of type of list
+  Stream<List<Brew>> get brews {
     return brewCollection.snapshots().map(
         _brewListFromSnapshot); // converting the snapshots obtained into our own iterable object
   }
+
+  // we r taking user document here and then taking data from there
+  // we r setting up  a stream
+  Stream<UserData> get userData {
+    return brewCollection
+        .document(uid)
+        .snapshots() // firebase stream
+        .map(_userDataFromSnapshot);// mapping firebase stream into user datamodel
+    // here we returning the snapshot of every document whenever user signin
+  }
+  // here we r converting firebase stream into user data model
 }
